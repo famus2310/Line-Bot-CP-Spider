@@ -16,6 +16,7 @@ CP_CONTEST_SITES = [
     "leetcode"
 ]
 
+REFRESH_URL = "https://cp-tc-contest-spider.herokuapp.com/refresh_contest"
 ANNOUNCE_URL = "https://cp-tc-contest-spider.herokuapp.com/announce"
 URL = "https://clist.by/"
 
@@ -54,5 +55,4 @@ with requests.Session() as sess:
         link = link.strip('\"')
         title = title.strip('\"')
         payload["contests"].append({"title" : title, "link" : link})
-
-    sess.post(URL, json=payload)
+    sess.post(REFRESH_URL, json=payload)

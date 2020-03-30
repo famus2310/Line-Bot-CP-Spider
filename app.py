@@ -51,9 +51,10 @@ def sendReplyMessage(token, msg):
 
 def get_all_contest():
     contests = [x.serialize() for x in Contest.query.all()]
+   
     list_of_contest = []
     for contest in contests:
-        list_of_contest.append(str(contest.title) + " " + str(contest.link))
+        list_of_contest.append(str(contest["title"]) + " (" + str(contest["link"]) + ")")
     
     return list_of_contest
     
