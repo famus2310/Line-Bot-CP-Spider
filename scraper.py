@@ -45,9 +45,14 @@ with requests.Session() as sess:
 
                 break
                 
-    with open('tobeannounced.txt', 'w') as announce:
-        for i in cp_contest_titles:
-            link, title = i.split(' title=')
-            link = link.strip('\"')
-            title = title.strip('\"')
-            announce.write(f"{title} ({link})\n")
+    payload = {
+        "secret_key": os.environ.get('SECRET_KEY'),
+        "contests": []
+    }
+    for i in cp_contest_titles:
+        link, title = i.split(' title=')
+        link = link.strip('\"')
+        title = title.strip('\"')
+        payload["contests"].append({"title" : title, "link" : link})
+
+    sess.post(URL, json=payload)

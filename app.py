@@ -1,10 +1,11 @@
-# mybot/app.py
 import os
 import datetime
 from decouple import config
 from flask import (
     Flask, request, abort
 )
+from flask_sqlalchemy import SQLAlchemy
+
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -13,6 +14,13 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, JoinEvent, FollowEvent
 )
 app = Flask(__name__)
+app.config.from_object(os.environ.get('APP_SETTINGS'))
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+from models import Contest
+
+
 # get LINE_CHANNEL_ACCESS_TOKEN from your environment variable
 line_bot_api = LineBotApi(os.environ.get('CHANNEL_ACCESS_TOKEN'))
 # get LINE_CHANNEL_SECRET from your environment variable
@@ -40,6 +48,14 @@ def sendReplyMessage(token, msg):
         token,
         TextSendMessage(text=msg)
     )
+
+def get_all_contest():
+    contests = [x.serialize() for x in Contest.query.all()]
+    list_of_contest = []
+    for contest in contests:
+        list_of_contest.append(str(contest.title) + " " + str(contest.link))
+    
+    return list_of_contest
     
 def credit():
     return "- Made by Komunitas CP TC with \u2764\n\n"
@@ -90,6 +106,27 @@ def callback():
 
 
     return 'OK'
+
+@app.route('/refresh_contest', methods=['POST'])
+def refresh_contest():
+    key = request.json["secret_key"]
+    if key != os.environ.get('SECRET_KEY'):
+        return "Key doesnt match."
+    list_of_contest = request.json['contests']
+    try:
+        num_rows_deleted = db.session.query(Contest).delete()
+        for contest in list_of_contest:
+            new_contest = Contest(
+                title = contest['title'],
+                link = contest['link']
+            )
+            db.session.add(new_contest)
+        db.session.commit()
+        return 'OK'
+    except:
+        db.session.rollback()
+        return 'ERROR DB'
+    
 
 
 @handler.add(JoinEvent)
@@ -169,18 +206,18 @@ def handle_text_message(event):
         msg += "-----------------------------------------------------\n"
         msg += credit()
         reply = True
-        with open('tobeannounced.txt', 'r+') as announce:
-            for lines in announce:
-                cur = '*' + lines + '\n'
-                if (len(msg) + len(cur) < 1000):
-                    msg += cur
+        announce = get_all_contest()
+        for lines in announce:
+            cur = '*' + lines + '\n'
+            if (len(msg) + len(cur) < 1000):
+                msg += cur
+            else:
+                if reply:
+                    sendReplyMessage(event.reply_token, msg)
                 else:
-                    if reply:
-                        sendReplyMessage(event.reply_token, msg)
-                    else:
-                        sendPushMessage(event, msg)
-                    reply = False
-                    msg = cur
+                    sendPushMessage(event, msg)
+                reply = False
+                msg = cur
         
         if len(msg) != 0:
             if reply:
