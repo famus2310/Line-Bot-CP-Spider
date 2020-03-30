@@ -17,6 +17,7 @@ psycopg2-binary = "*"
 flask-sqlalchemy = "*"
 flask-script = "*"
 flask-migrate = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.6"
