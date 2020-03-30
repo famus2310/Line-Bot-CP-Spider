@@ -16,8 +16,9 @@ CP_CONTEST_SITES = [
     "leetcode"
 ]
 
-REFRESH_URL = "https://cp-tc-contest-spider.herokuapp.com/refresh_contest"
-ANNOUNCE_URL = "https://cp-tc-contest-spider.herokuapp.com/announce"
+BASE_URL = "https://cp-tc-contest-spider.herokuapp.com"
+REFRESH_URL = BASE_URL + "/refresh_contest"
+ANNOUNCE_URL = BASE_URL + "/announce"
 URL = "https://clist.by/"
 
 print("Start SCRAPING")
@@ -34,6 +35,7 @@ with requests.Session() as sess:
         coming_hour, coming_minute, coming_second = duration.split(':')
         if (int(coming_hour) < 2):
             payload = {
+                "secret_key": os.environ.get('SECRET_KEY'),
                 "text" : str(coming_title) + " starts in " + str(coming_hour) + " hours " + str(coming_minute) + " minutes " + str(coming_second) + " second "
             }
             resp = sess.post(ANNOUNCE_URL, data=payload)

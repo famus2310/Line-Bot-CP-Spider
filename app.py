@@ -49,6 +49,9 @@ def sendReplyMessage(token, msg):
         TextSendMessage(text=msg)
     )
 
+def check_secret_key(key):
+    return key == os.environ.get('SECRET_KEY')
+
 def get_all_contest():
     contests = [x.serialize() for x in Contest.query.all()]
    
@@ -57,12 +60,16 @@ def get_all_contest():
         list_of_contest.append(str(contest["title"]) + " (" + str(contest["link"]) + ")\n")
     
     return list_of_contest
+
     
 def credit():
     return "- Made by Komunitas CP TC with \u2764\n\n"
 
 @app.route("/announce", methods=['POST'])
 def announce():
+    key = request.form['secret_key']
+    if not check_secret_key(key):
+        return "Key doesnt match"
     msg = "This contest will start in less than 2 Hour.\n"
     msg += "Make sure you already registered!\n\n"
     msg += request.form['text']
@@ -111,8 +118,8 @@ def callback():
 @app.route('/refresh_contest', methods=['POST'])
 def refresh_contest():
     key = request.json["secret_key"]
-    if key != os.environ.get('SECRET_KEY'):
-        return "Key doesnt match."
+    if not check_secret_key(key):
+        return "Key doesnt match"
     list_of_contest = request.json['contests']
     try:
         num_rows_deleted = db.session.query(Contest).delete()
