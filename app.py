@@ -72,7 +72,7 @@ def updateNotify(event, action):
         if is_exist is None:
             try:
                 db.session.add(notify)
-                db.commit()
+                db.session.commit()
                 msg =  "---------------------------------------\n"
                 msg += "| Notifier: |\n"
                 msg += "---------------------------------------\n"
@@ -81,7 +81,7 @@ def updateNotify(event, action):
                 sendReplyMessage(event.reply_token, msg)
                 return 'OK'
             except:
-                db.rollback()
+                db.session.rollback()
                 return 'DB ERROR'
         else:
             msg =  "---------------------------------------\n"
@@ -103,7 +103,7 @@ def updateNotify(event, action):
         else:
             try:
                 db.session.delete(notify)
-                db.commit()
+                db.session.commit()
                 msg =  "---------------------------------------\n"
                 msg += "| Notifier: |\n"
                 msg += "---------------------------------------\n"
@@ -112,7 +112,7 @@ def updateNotify(event, action):
                 sendReplyMessage(event.reply_token, msg)
                 return 'OK'
             except:
-                db.rollback()
+                db.session.rollback()
                 return 'DB ERROR'
     
 
