@@ -19,6 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 from models import Contest
+from models import Notify
 
 
 # get LINE_CHANNEL_ACCESS_TOKEN from your environment variable
@@ -49,8 +50,74 @@ def sendReplyMessage(token, msg):
         TextSendMessage(text=msg)
     )
 
+def updateNotify(event, action):
+    source_type, source_id = "", ""
+    if event.source.type == 'group':
+        source_type = 'group'
+        source_id = event.source.group_id
+    elif event.source.type == 'user':
+        source_type = 'user'
+        source_id = event.source.user_id
+    elif  event.source.type == 'room':
+        source_type = 'room'
+        source_id = event.source.room_id
+
+    notify = Notify(
+        source_type = source_type
+        source_id = source_id
+    )
+
+    bool is_exist = len(Notify.query.filter(Notify.source_id == source_id, Notify.source_type == source_type)) != 0
+    if action == 'add':
+        if not is_exist:
+            try:
+                db.session.add(notify)
+                db.commit()
+                msg =  "---------------------------------------\n"
+                msg += "| Notifier: |\n"
+                msg += "---------------------------------------\n"
+                msg += credit
+                msg += "You will be notified for upcoming contest that have less than 2 hours left for registration :)"
+                sendReplyMessage(event.reply_token, msg)
+                return 'OK'
+            except:
+                db.rollback()
+                return 'DB ERROR'
+        else:
+            msg =  "---------------------------------------\n"
+            msg += "| Notifier: |\n"
+            msg += "---------------------------------------\n"
+            msg += credit
+            msg += "You already registered with Notifier :)"
+            sendReplyMessage(event.reply_token, msg)
+            return 'OK'
+    else if action == 'delete':
+        if not is_exist:
+            msg =  "---------------------------------------\n"
+            msg += "| Notifier: |\n"
+            msg += "---------------------------------------\n"
+            msg += credit
+            msg += "You are not registered with Notifier :("
+            sendReplyMessage(event.reply_token, msg)
+            return 'OK'
+        else:
+            try:
+                db.session.delete(notify)
+                db.commit()
+                msg =  "---------------------------------------\n"
+                msg += "| Notifier: |\n"
+                msg += "---------------------------------------\n"
+                msg += credit
+                msg += "You will be unnotified by Notifier :("
+                sendReplyMessage(event.reply_token, msg)
+                return 'OK'
+            except:
+                db.rollback()
+                return 'DB ERROR'
+    
+
 def check_secret_key(key):
-    return key == os.environ.get('SECRET_KEY')
+    return key == app.config['SECRET_KEY']
 
 def get_all_contest():
     contests = [x.serialize() for x in Contest.query.all()]
@@ -61,6 +128,9 @@ def get_all_contest():
     
     return list_of_contest
 
+def get_all_notify():
+    notifies = [x.serialize() for x in Notify.query.all()]
+    return notifies
     
 def credit():
     return "- Made by Komunitas CP TC with \u2764\n\n"
@@ -74,25 +144,16 @@ def announce():
     msg += "Make sure you already registered!\n\n"
     msg += request.form['text']
 
-    with open("static_file/groups.txt", "r") as f:
-        for line in f:
-            try:
-                line_bot_api.push_message(
-                    line,
-                    TextSendMessage(text=msg)
-                )
-            except:
-                pass
-
-    with open("static_file/users.txt", "r") as f:
-        for line in f:
-            try:
-                line_bot_api.push_message(
-                    line,
-                    TextSendMessage(text=msg)
-                )
-            except:
-                pass
+    list_of_notify = get_all_notify()
+    
+    for notify in list_of_notify:
+        try:
+            line_bot_api.push_message(
+                str(notify['source_id']),
+                TextSendMessage(text=msg)
+            )
+        except:
+            pass
 
     return 'OK'
 
@@ -139,9 +200,6 @@ def refresh_contest():
 
 @handler.add(JoinEvent)
 def handle_join(event):
-    with open("static_file/groups.txt", "a") as f:
-        f.write(event.source.group_id + '\n')
-
     welcome = "Hello, we hope you enjoy using this\n"
     welcome += "bot. Type !help for list of command :)\n\n"
     welcome += credit()
@@ -165,40 +223,6 @@ def handle_follow(event):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
-    print(event)
-    if event.source.type == 'group':
-        groupExist = False
-        with open("static_file/groups.txt", "r") as f:
-            for lines in f:
-                if event.source.group_id in lines:
-                    groupExist = True
-
-        if not groupExist:
-            with open("static_file/groups.txt", "a+") as f:
-                f.write(event.source.group_id + '\n')
-
-    if event.source.type == 'room':
-        roomExist = False
-        with open("static_file/rooms.txt", "r") as f:
-            for lines in f:
-                if event.source.room_id in lines:
-                    roomExist = True
-        
-        if not roomExist:
-            with open("static_file/rooms.txt", "a+") as f:
-                f.write(event.source.room_id + '\n')
-
-    if event.source.type == 'user':
-        userExist = False
-        with open("static_file/users.txt", "r") as f:
-            for lines in f:
-                if event.source.user_id in lines:
-                    userExist = True
-        
-        if not userExist:
-            with open("static_file/users.txt", "a+") as f:
-                f.write(event.source.user_id + '\n')
-
     if event.message.text == '!help':
         msg =  "------------------------------------------\n"
         msg += "| Here's your command: |\n"
