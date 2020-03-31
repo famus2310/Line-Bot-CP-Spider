@@ -67,9 +67,9 @@ def updateNotify(event, action):
         source_id = source_id
     )
 
-    is_exist = len(Notify.query.filter(Notify.source_id == source_id, Notify.source_type == source_type)) != 0
+    is_exist = Notify.query.filter(Notify.source_id == source_id, Notify.source_type == source_type).scalar()
     if action == 'add':
-        if not is_exist:
+        if is_exist is None:
             try:
                 db.session.add(notify)
                 db.commit()
@@ -92,7 +92,7 @@ def updateNotify(event, action):
             sendReplyMessage(event.reply_token, msg)
             return 'OK'
     elif action == 'delete':
-        if not is_exist:
+        if is_exist is None:
             msg =  "---------------------------------------\n"
             msg += "| Notifier: |\n"
             msg += "---------------------------------------\n"
