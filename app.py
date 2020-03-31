@@ -104,8 +104,8 @@ def updateNotify(event, action):
             return 'OK'
         else:
             try:
-                print(obj.first)
-                db.session.delete(obj.first)
+                print(obj.first())
+                db.session.delete(obj.first())
                 db.session.commit()
                 msg =  "---------------------------------------\n"
                 msg += "| Notifier: |\n"
