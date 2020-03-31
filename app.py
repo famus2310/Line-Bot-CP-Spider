@@ -262,7 +262,7 @@ def handle_text_message(event):
     if event.message.text == '!notify':
         updateNotify(event, 'add')
     
-    if event.message.text == 'unnotify':
+    if event.message.text == '!unnotify':
         updateNotify(event, 'delete')
 
 if __name__ == "__main__":
