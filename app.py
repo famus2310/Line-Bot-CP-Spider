@@ -63,11 +63,11 @@ def updateNotify(event, action):
         source_id = event.source.room_id
 
     notify = Notify(
-        source_type = source_type
+        source_type = source_type,
         source_id = source_id
     )
 
-    bool is_exist = len(Notify.query.filter(Notify.source_id == source_id, Notify.source_type == source_type)) != 0
+    is_exist = len(Notify.query.filter(Notify.source_id == source_id, Notify.source_type == source_type)) != 0
     if action == 'add':
         if not is_exist:
             try:
@@ -91,7 +91,7 @@ def updateNotify(event, action):
             msg += "You already registered with Notifier :)"
             sendReplyMessage(event.reply_token, msg)
             return 'OK'
-    else if action == 'delete':
+    elif action == 'delete':
         if not is_exist:
             msg =  "---------------------------------------\n"
             msg += "| Notifier: |\n"
@@ -229,7 +229,9 @@ def handle_text_message(event):
         msg += "------------------------------------------\n"
         msg += credit()
         msg += "1. !schedule\n[to see all upcoming contest]\n\n"
-        msg += "2. !help\n[to see list of commands]"
+        msg += "2. !notify\n[to get notified for upcoming contest]\n\n"
+        msg += "3. !unnotify\n[to disable notifier for upcoming contest]\n\n"
+        msg += "4. !help\n[to see list of commands]"
         sendReplyMessage(event.reply_token, msg)
 
     if event.message.text == '!schedule':
@@ -257,7 +259,11 @@ def handle_text_message(event):
             else:
                 sendPushMessage(event, msg)
 
-
+    if event.message.text == '!notify':
+        updateNotify(event, 'add')
+    
+    if event.message.text == 'unnotify':
+        updateNotify(event, 'delete')
 
 if __name__ == "__main__":
     app.run()
