@@ -75,9 +75,9 @@ def updateNotify(event, action):
             try:
                 db.session.add(notify)
                 db.session.commit()
-                msg =  "---------------------------------------\n"
+                msg =  "------------------\n"
                 msg += "| Notifier: |\n"
-                msg += "---------------------------------------\n"
+                msg += "------------------\n"
                 msg += credit()
                 msg += "You will be notified for upcoming contest that have less than 2 hours left for registration :)"
                 sendReplyMessage(event.reply_token, msg)
@@ -86,18 +86,18 @@ def updateNotify(event, action):
                 db.session.rollback()
                 return 'DB ERROR'
         else:
-            msg =  "---------------------------------------\n"
+            msg =  "------------------\n"
             msg += "| Notifier: |\n"
-            msg += "---------------------------------------\n"
+            msg += "------------------\n"
             msg += credit()
             msg += "You already registered with Notifier :)"
             sendReplyMessage(event.reply_token, msg)
             return 'OK'
     elif action == 'delete':
         if is_exist is None:
-            msg =  "---------------------------------------\n"
+            msg =  "------------------\n"
             msg += "| Notifier: |\n"
-            msg += "---------------------------------------\n"
+            msg += "------------------\n"
             msg += credit()
             msg += "You are not registered with Notifier :("
             sendReplyMessage(event.reply_token, msg)
@@ -107,9 +107,9 @@ def updateNotify(event, action):
                 print(obj.first())
                 db.session.delete(obj.first())
                 db.session.commit()
-                msg =  "---------------------------------------\n"
+                msg =  "------------------\n"
                 msg += "| Notifier: |\n"
-                msg += "---------------------------------------\n"
+                msg += "------------------\n"
                 msg += credit()
                 msg += "You will be unnotified by Notifier :("
                 sendReplyMessage(event.reply_token, msg)

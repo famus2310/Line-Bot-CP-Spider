@@ -31,20 +31,25 @@ with requests.Session() as sess:
     contest_coming = soup.find("div", {"class": "coming"})
     duration = contest_coming.find("div", {"class": "countdown"}).text.strip()
     coming_title = contest_coming.find("span", {"class": "contest_title"}).text.strip()
+    coming_link = contest_coming.find("span", {"class": "contest_title"}).a['href']
     if "days" not in duration:
         coming_hour, coming_minute, coming_second = duration.split(':')
         if (int(coming_hour) < 2):
             payload = {
                 "secret_key": os.environ.get('SECRET_KEY'),
-                "text" : str(coming_title) + " starts in " + str(coming_hour) + " hours " + str(coming_minute) + " minutes " + str(coming_second) + " second "
+                "text" : str(coming_title) + "\n(" + str(coming_link) + ")\n" + "starts in " + str(coming_hour) + " hours " + str(coming_minute) + " minutes " + str(coming_second) + " second "
             }
             resp = sess.post(ANNOUNCE_URL, data=payload)
 
     cp_contest_titles = []
+    print(contest_titles[0])
     for x in contest_titles:
         for y in CP_CONTEST_SITES:
             if y in str(x):
-                cp_contest_titles.append(re.search('href="(?!#)(.)*"', str(x))[0].strip('href='))
+                title = x.a.attrs.get('title')
+                href = x.a.attrs.get('href')
+                if title is not None and href is not None:
+                    cp_contest_titles.append((href, title))
 
                 break
                 
@@ -53,8 +58,6 @@ with requests.Session() as sess:
         "contests": []
     }
     for i in cp_contest_titles:
-        link, title = i.split(' title=')
-        link = link.strip('\"')
-        title = title.strip('\"')
+        link, title = i[0], i[1]
         payload["contests"].append({"title" : title, "link" : link})
     sess.post(REFRESH_URL, json=payload)
