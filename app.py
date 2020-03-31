@@ -76,7 +76,7 @@ def updateNotify(event, action):
                 msg =  "---------------------------------------\n"
                 msg += "| Notifier: |\n"
                 msg += "---------------------------------------\n"
-                msg += credit
+                msg += credit()
                 msg += "You will be notified for upcoming contest that have less than 2 hours left for registration :)"
                 sendReplyMessage(event.reply_token, msg)
                 return 'OK'
@@ -87,7 +87,7 @@ def updateNotify(event, action):
             msg =  "---------------------------------------\n"
             msg += "| Notifier: |\n"
             msg += "---------------------------------------\n"
-            msg += credit
+            msg += credit()
             msg += "You already registered with Notifier :)"
             sendReplyMessage(event.reply_token, msg)
             return 'OK'
@@ -96,7 +96,7 @@ def updateNotify(event, action):
             msg =  "---------------------------------------\n"
             msg += "| Notifier: |\n"
             msg += "---------------------------------------\n"
-            msg += credit
+            msg += credit()
             msg += "You are not registered with Notifier :("
             sendReplyMessage(event.reply_token, msg)
             return 'OK'
@@ -107,7 +107,7 @@ def updateNotify(event, action):
                 msg =  "---------------------------------------\n"
                 msg += "| Notifier: |\n"
                 msg += "---------------------------------------\n"
-                msg += credit
+                msg += credit()
                 msg += "You will be unnotified by Notifier :("
                 sendReplyMessage(event.reply_token, msg)
                 return 'OK'
