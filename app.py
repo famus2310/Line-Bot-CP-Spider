@@ -68,6 +68,7 @@ def updateNotify(event, action):
     )
 
     obj = Notify.query.filter(Notify.source_id == source_id, Notify.source_type == source_type)
+    print(obj)
     is_exist = obj.scalar()
     if action == 'add':
         if is_exist is None:
@@ -103,7 +104,8 @@ def updateNotify(event, action):
             return 'OK'
         else:
             try:
-                db.session.delete(obj)
+                print(obj.first)
+                db.session.delete(obj.first)
                 db.session.commit()
                 msg =  "---------------------------------------\n"
                 msg += "| Notifier: |\n"
