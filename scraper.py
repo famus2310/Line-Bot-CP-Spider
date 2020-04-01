@@ -28,21 +28,28 @@ with requests.Session() as sess:
     soup = BeautifulSoup(resp.text, 'html.parser')
     mydivs = soup.findAll("div", {"class": "contest"})
     contest_titles = soup.findAll("span", {"class": "contest_title"})
-    contest_coming = soup.find("div", {"class": "coming"})
-    duration = contest_coming.find("div", {"class": "countdown"}).text.strip()
-    coming_title = contest_coming.find("span", {"class": "contest_title"}).text.strip()
-    coming_link = contest_coming.find("span", {"class": "contest_title"}).a['href']
-    if "days" not in duration:
-        coming_hour, coming_minute, coming_second = duration.split(':')
-        if (int(coming_hour) < 2):
-            payload = {
-                "secret_key": os.environ.get('SECRET_KEY'),
-                "text" : str(coming_title) + "\n(" + str(coming_link) + ")\n" + "starts in " + str(coming_hour) + " hours " + str(coming_minute) + " minutes " + str(coming_second) + " second "
-            }
-            resp = sess.post(ANNOUNCE_URL, data=payload)
-
+    contest_coming_list = soup.findAll("div", {"class": "coming"})
+    found = False
+    for contest in contest_coming_list:
+        for cp_site in CP_CONTEST_SITES:
+            if cp_site in contest.text:
+                contest_coming = contest
+                found = True
+        if found:
+            break
+    if found:
+        duration = contest_coming.find("div", {"class": "countdown"}).text.strip()
+        coming_title = contest_coming.find("span", {"class": "contest_title"}).text.strip()
+        coming_link = contest_coming.find("span", {"class": "contest_title"}).a['href']
+        if "days" not in duration:
+            coming_hour, coming_minute, coming_second = duration.split(':')
+            if (int(coming_hour) < 2):
+                payload = {
+                    "secret_key": os.environ.get('SECRET_KEY'),
+                    "text" : str(coming_title) + "\n(" + str(coming_link) + ")\n" + "starts in " + str(coming_hour) + " hours " + str(coming_minute) + " minutes " + str(coming_second) + " second "
+                }
+                resp = sess.post(ANNOUNCE_URL, data=payload)
     cp_contest_titles = []
-    print(contest_titles[0])
     for x in contest_titles:
         for y in CP_CONTEST_SITES:
             if y in str(x):
