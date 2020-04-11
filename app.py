@@ -186,16 +186,13 @@ def refresh_contest():
         return "Key doesnt match"
     list_of_contest = request.json['contests']
     try:
-        print("deleting")
         num_rows_deleted = db.session.query(Contest).delete()
-        print(num_rows_deleted)
         for contest in list_of_contest:
             new_contest = Contest(
                 title = contest['title'],
                 link = contest['link'],
                 status = contest['status']
             )
-            print(new_contest)
             db.session.add(new_contest)
         db.session.commit()
         return 'OK'

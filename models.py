@@ -8,7 +8,7 @@ class Contest(db.Model):
     link = db.Column(db.String())
     status = db.Column(db.String())
 
-    def __init__(self, title, link):
+    def __init__(self, title, link, status):
         self.title = title
         self.link = link
         self.status = status

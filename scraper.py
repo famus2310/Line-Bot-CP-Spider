@@ -22,7 +22,7 @@ STATUS_LIST = [
   "past"
 ]
 
-BASE_URL = "https://cp-tc-contest-spider.herokuapp.com"
+BASE_URL = "http://127.0.0.1:5000" #"https://cp-tc-contest-spider.herokuapp.com"
 REFRESH_URL = BASE_URL + "/refresh_contest"
 ANNOUNCE_URL = BASE_URL + "/announce"
 URL = "https://clist.by/"
@@ -82,4 +82,3 @@ with requests.Session() as sess:
     link, title, status = i[0], i[1], i[2]
     payload["contests"].append({"title" : title, "link" : link, "status" : status})
   resp = sess.post(REFRESH_URL, json=payload)
-  print(resp.text)
