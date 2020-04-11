@@ -22,7 +22,7 @@ STATUS_LIST = [
   "past"
 ]
 
-BASE_URL = "http://127.0.0.1:5000" #"https://cp-tc-contest-spider.herokuapp.com"
+BASE_URL = "https://cp-tc-contest-spider.herokuapp.com"
 REFRESH_URL = BASE_URL + "/refresh_contest"
 ANNOUNCE_URL = BASE_URL + "/announce"
 URL = "https://clist.by/"
