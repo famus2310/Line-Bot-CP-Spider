@@ -193,6 +193,7 @@ def refresh_contest():
                 link = contest['link'],
                 status = contest['status']
             )
+            print(new_contest)
             db.session.add(new_contest)
         db.session.commit()
         return 'OK'
