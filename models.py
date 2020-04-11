@@ -6,10 +6,12 @@ class Contest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String())
     link = db.Column(db.String())
+    status = db.Column(db.String())
 
     def __init__(self, title, link):
         self.title = title
         self.link = link
+        self.status = status
     
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -18,7 +20,8 @@ class Contest(db.Model):
         return {
             'id': self.id, 
             'title': self.title,
-            'link': self.link
+            'link': self.link,
+            'status': self.status
         }
 
 class Notify(db.Model):
