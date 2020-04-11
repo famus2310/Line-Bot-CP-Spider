@@ -127,7 +127,7 @@ def get_all_contest():
    
     list_of_contest = []
     for contest in contests:
-        list_of_contest.append(str(contest["title"]) + " (" + str(contest["link"]) + ")\n")
+        list_of_contest.append("(" + str(contest['status']) + ") " +str(contest["title"]) + " (" + str(contest["link"]) + ")\n")
     
     return list_of_contest
 

@@ -70,7 +70,7 @@ with requests.Session() as sess:
         title = cur_title.a.get('title')
         href = cur_title.a.get('href')
         if title is not None and href is not None:
-          cp_contest_titles.append((href, title, status.capitalize()))
+          cp_contest_titles.append((href, title, status.upper()))
 
           break
         
