@@ -190,7 +190,8 @@ def refresh_contest():
         for contest in list_of_contest:
             new_contest = Contest(
                 title = contest['title'],
-                link = contest['link']
+                link = contest['link'],
+                status = contest['status']
             )
             db.session.add(new_contest)
         db.session.commit()
