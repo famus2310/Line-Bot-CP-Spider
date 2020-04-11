@@ -81,4 +81,5 @@ with requests.Session() as sess:
   for i in cp_contest_titles:
     link, title, status = i[0], i[1], i[2]
     payload["contests"].append({"title" : title, "link" : link, "status" : status})
-  sess.post(REFRESH_URL, json=payload)
+  resp = sess.post(REFRESH_URL, json=payload)
+  print(resp.text)
